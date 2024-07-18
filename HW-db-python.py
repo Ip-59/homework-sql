@@ -1,43 +1,7 @@
 from pprint import pprint
 import psycopg2
 
-# Игорь, у вас функционально в целом все ок, только, конечно, не стоит определять функции внутри курсора и менеджера подключения.
-# Через них должно происходить именно общение с базой. В них нужно организовать именно вызов действий, а не определения.
-# А для подключения можно использовать контекстный менеджер with psycopg2.connect(***) as con:, который и коммиты автоматически
-# будет делать после выполнения всех действий в нем.
-# Посмотрите на каркас кода в подсказке в описании задания, там как раз более корректный подход)
-# Давайте это поправим.
-# import psycopg2
 
-# def create_db(conn):
-#     pass
-
-# def add_client(conn, first_name, last_name, email, phones=None):
-#     pass
-
-# def add_phone(conn, client_id, phone):
-#     pass
-
-# def change_client(conn, client_id, first_name=None, last_name=None, email=None, phones=None):
-#     pass
-
-# def delete_phone(conn, client_id, phone):
-#     pass
-
-# def delete_client(conn, client_id):
-#     pass
-
-# def find_client(conn, first_name=None, last_name=None, email=None, phone=None):
-#     pass
-
-
-# with psycopg2.connect(database="clients_db", user="postgres", password="postgres") as conn:
-#     pass  # вызывайте функции здесь
-
-# conn.close()
-
-
-# 
 def delete_db(conn):
 
     with conn.cursor() as cur:
