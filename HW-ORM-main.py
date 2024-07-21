@@ -1,5 +1,7 @@
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
+import datetime
+from datetime import datetime
 
 from models import create_tables, Publisher, Book, Shop, Stock, Sale
 
@@ -40,22 +42,27 @@ session.add_all([sale_1, sale_2, sale_3, sale_4, sale_5])
 
 session.commit()
 
-# принимает имя или идентификатор издателя (publisher), например, через input(). Выводит построчно факты покупки книг этого издателя:
-# название книги | название магазина, в котором была куплена эта книга | стоимость покупки | дата покупки
-# Пример (было введено имя автора — Пушкин):
-# Капитанская дочка | Буквоед     | 600 | 09-11-2022
-# Руслан и Людмила  | Буквоед     | 500 | 08-11-2022
-# Капитанская дочка | Лабиринт    | 580 | 05-11-2022
-# Евгений Онегин    | Книжный дом | 490 | 02-11-2022
-# Капитанская дочка | Буквоед     | 600 | 26-10-2022
 
-ent_publ = input("Введите фамилию автора: ")
+def get_shops(publisher):
+    
+    q = session.query(
+        Publisher.id, Publisher.p_name, Book.title, Shop.sh_name, Sale.price, Sale.date_sale
+    ).select_from(Shop). \
+    join(Stock, Shop.id == Stock.id_shop).\
+    join(Book, Stock.id_book == Book.id).\
+    join(Publisher, Book.id_publisher == Publisher.id).\
+    join(Sale, Sale.id_stock == Stock.id)
 
-subq = session.query(Shop, Sale, Stock, Book, Publisher
-                    ).filter(Publisher.p_name == ent_publ
-                    ).filter(Book.id_publisher == Publisher.id
-                    ).filter(Stock.id_book == Book.id
-                    ).filter(Sale.id_stock == Stock.id
-                    ).filter(Shop.id == Stock.id_shop)
-for a in subq.all():
-    print(a.Book.title, a.Shop.sh_name, a.Sale.price, a.Sale.date_sale, sep='\t|')
+    if publisher.isdigit(): #Проверяем переданные данные в функцию на то, что строка состоит только из чисел
+        shops = q.filter(Publisher.id == publisher).all() #Обращаемся к запросу, который составили ранее, и фильтруем по id
+    else:
+        shops = q.filter(Publisher.p_name == publisher).all() #Обращаемся к запросу, который составили ранее, и фильтруем по фамилии автора
+
+    for p_name, p_id, title, name, price, date_sale in shops: 
+        print(f"{title: <17} | {name: <11} | {price: <3} | {date_sale.strftime('%d-%m-%Y')}")
+
+
+if __name__ == '__main__':
+
+    ent_publ = input("Введите фамилию или id автора: ")
+    get_shops(ent_publ)
